@@ -4,6 +4,8 @@ import User from "../entity/User";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import cookie from  "cookie";
+import userMiddleware from '../middleware/user';
+import authMiddleware from '../middleware/auth';
 
 const mapError = (errors: Object[])=>{
     return errors.reduce((prev:any,err:any)=>{
@@ -12,6 +14,7 @@ const mapError = (errors: Object[])=>{
     },{})
 }
 
+//API
 const register = async (req: Request,res:Response)=>{
     const {email,username,password} = req.body;
     
@@ -23,8 +26,8 @@ const register = async (req: Request,res:Response)=>{
         const usernameUser = await User.findOneBy({username});
 
         //emit error
-        if(emailUser) errors.email ="This email address is already being used"
-        if(usernameUser) errors.username ="This user name is already being used"
+        if(emailUser) errors.email ="This email address already exists"
+        if(usernameUser) errors.username ="This user name already exists"
 
         //send error
         if(Object.keys(errors).length >0){
@@ -101,9 +104,15 @@ const login = async (req: Request,res:Response) => {
     
 }
 
+const me = async (_: Request,res:Response) => {
+    return res.json(res.locals.user)
+}
+
+//Route
 const router=Router()
 router.post('/register',register)
 router.post('/login',login)
+router.get('/me',userMiddleware,authMiddleware,me)
 
 
 export default router;
