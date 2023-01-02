@@ -108,11 +108,25 @@ const me = async (_: Request,res:Response) => {
     return res.json(res.locals.user)
 }
 
+const logout = async (_: Request,res:Response) => {
+    res.set(
+        "Set-Cookie",
+        cookie.serialize("token","",{
+            httpOnly:true,
+            expires: new Date(0),
+            path:'/'
+        })
+    )
+    res.status(200).json({success: true})
+}
+
 //Route
 const router=Router()
 router.post('/register',register)
 router.post('/login',login)
 router.get('/me',userMiddleware,authMiddleware,me)
+router.post('/logout',userMiddleware,authMiddleware,logout)
+
 
 
 export default router;
