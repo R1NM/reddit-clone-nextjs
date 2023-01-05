@@ -5,6 +5,7 @@ import authMiddleware from '../middleware/auth';
 import Sub from "../entity/Sub";
 import { AppDataSource } from "../data-source"
 import User from "../entity/User";
+import Post from "../entity/Post";
 
 
 //API
@@ -60,9 +61,34 @@ const createSub=async (req: Request,res:Response, next) => {
     }
 }
 
+const topSubs =async (_: Request, res: Response) => {
+    try {
+        const imageUrlExp= `COALESCE('${process.env.APP_URL}/images/'||s."imageUrn",
+        'https://www.gravatar.com/avatar?d=mp&f=y'
+        )`;
+
+        const subs = await AppDataSource
+        .createQueryBuilder()
+        .select(`s.title, s.name, ${imageUrlExp} as "imageUrl", count(p.id) as "postCount"`)
+        .from(Sub,"s")
+        .leftJoin(Post,"p",`s.name= p."subName"`)
+        .groupBy('s.title, s.name, "imageUrl"')
+        .orderBy(`"postCount"`,"DESC")
+        .limit(5)
+        .execute();
+
+        return res.json(subs);
+
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({error: "Something went wrong"})
+        
+    }
+}
 
 //Route
 const router=Router()
 router.post('/',userMiddleware,authMiddleware,createSub)
+router.get("/sub/topSubs",topSubs)
 
 export default router;
