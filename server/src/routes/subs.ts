@@ -94,9 +94,23 @@ const topSubs =async (_: Request, res: Response) => {
 const getSub = async (req: Request, res:Response) => {
     const name = req.params.name;
     
-    
     try {
         const sub = await Sub.findOneByOrFail({name});
+
+        const posts = await Post.find({
+            where: {subName: sub.name},
+            order: {createdAt: "DESC"},
+            relations: ["comments","votes"]
+        })
+
+        sub.posts =posts;
+
+        if(res.locals.user){
+            sub.posts.forEach((p)=>p.setUserVote(res.locals.user))
+        }
+        console.log(sub);
+        
+
         return res.json(sub);
     } catch (error) {
         return res.status(404).json({error:"Sub not found"})
