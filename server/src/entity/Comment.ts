@@ -21,9 +21,16 @@ export default class Comment extends BaseEntity{
     @Column()
     username: string;
 
+    @Column()
+    postId: number;
+
     //////////////////////////////
     
     //////////Relations///////////
+    @ManyToOne(()=>User)
+    @JoinColumn({name:"username",referencedColumnName:"username"})
+    user: User;
+
     @ManyToOne(()=>Post, (post)=>post.comments,{nullable:false})
     post: Post;
 
