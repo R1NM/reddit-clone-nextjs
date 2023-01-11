@@ -10,7 +10,7 @@ export default async (_: Request,res:Response, next:NextFunction) => {
         
         return next();
     } catch (error) {
-        console.error(error);
+        console.log(error);
         return res.status(401).json({error: "Authentication Failed"})
         
     }
