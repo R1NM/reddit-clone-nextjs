@@ -1,7 +1,8 @@
 import { BeforeInsert, Column, Entity, Index, JoinColumn, ManyToOne, OneToMany } from "typeorm";
 import BaseEntity from './Entity';
 import {Exclude, Expose} from 'class-transformer';
-import { makeId, slugify } from "../utils/helpers";
+import { makeId } from "../utils/helpers";
+import { slugify } from "transliteration";
 import User from "./User";
 import Sub from "./Sub";
 import Comment from "./Comment";
